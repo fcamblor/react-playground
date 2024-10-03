@@ -11,6 +11,7 @@ function App() {
   const [count, setCount] = useState(0)
 
   const incrementCount = () => setCount(count+1);
+  const deferedIncrementCount = () => setTimeout(() => setCount(count+1000), 5000)
 
   return (
     <>
@@ -25,7 +26,7 @@ function App() {
       <h1>Vite + React ({process.env.NODE_ENV})</h1>
       <div className="card">
         <Counter count={count} onClick={incrementCount} />
-        <Counter count={count} onClick={incrementCount} />
+        <Counter count={count} onClick={deferedIncrementCount} />
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
