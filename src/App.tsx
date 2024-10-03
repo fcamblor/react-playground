@@ -27,6 +27,7 @@ function App() {
       <div className="card">
         <Counter count={count} onClick={incrementCount} />
         <Counter count={count} onClick={deferedIncrementCount} />
+        <button onClick={() => fetchPokemons()}>Fetch Pokemons</button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
@@ -45,6 +46,26 @@ function Counter({ count, onClick }: {count: number, onClick: () => void}) {
       count is {count}
     </button>
   )
+}
+
+type SpriteName = "back_default" | "front_default"
+type Pokemon = {
+  id: number
+  name: string,
+  sprites: Record<SpriteName, string>
+}
+
+type PokemonListItem = {
+  name: string,
+  url: string,
+}
+
+async function fetchPokemons(): Promise<Pokemon[]> {
+  const pokemonItemResp: {results: PokemonListItem[]} = await fetch('https://pokeapi.co/api/v2/pokemon/?limit=1000').then(resp => resp.json());
+  console.info(pokemonItemResp)
+  const pokemons = await Promise.all(pokemonItemResp.results.map(async pokemonItem => fetch(pokemonItem.url).then(resp => resp.json())))
+  console.log(pokemons)
+  return pokemons;
 }
 
 export default App
