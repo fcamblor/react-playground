@@ -8,6 +8,10 @@ let appRenderingCount = 0;
 function App() {
   appRenderingCount++
   console.log(`rendering App #${appRenderingCount}...`)
+  const [count, setCount] = useState(0)
+
+  const incrementCount = () => setCount(count+1);
+
   return (
     <>
       <div>
@@ -20,8 +24,8 @@ function App() {
       </div>
       <h1>Vite + React ({process.env.NODE_ENV})</h1>
       <div className="card">
-        <Counter initialValue={0} />
-        <Counter initialValue={42} />
+        <Counter count={count} onClick={incrementCount} />
+        <Counter count={count} onClick={incrementCount} />
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
@@ -33,12 +37,10 @@ function App() {
   )
 }
 
-function Counter({ initialValue}: {initialValue: number}) {
+function Counter({ count, onClick }: {count: number, onClick: () => void}) {
   console.log(`rendering Counter (from app rendering count #${appRenderingCount})...`)
-  const [count, setCount] = useState(initialValue)
-
   return (
-    <button onClick={() => setCount((count) => count + 1)}>
+    <button onClick={onClick}>
       count is {count}
     </button>
   )
