@@ -9,9 +9,25 @@ function App() {
   appRenderingCount++
   console.log(`rendering App #${appRenderingCount}...`)
   const [count, setCount] = useState(0)
+  const [pokemons, setPokemons] = useState<Pokemon[]>([])
 
   const incrementCount = () => setCount(count+1);
   const deferedIncrementCount = () => setTimeout(() => setCount(count+1000), 5000)
+
+  const fetchPokemonsClicked = async () => {
+    const pokemons = await fetchPokemons()
+    setPokemons(pokemons);
+  }
+
+  const movePokemon = (pokemonId: number, endingIndex: number) => {
+    const startingIndex = pokemons.findIndex(pk => pk.id === pokemonId)
+    if(startingIndex !== -1) {
+      const swap = pokemons[endingIndex]
+      pokemons[endingIndex] = pokemons[startingIndex]
+      pokemons[startingIndex] = swap;
+      setPokemons([...pokemons]);
+    }
+  }
 
   return (
     <>
@@ -27,7 +43,14 @@ function App() {
       <div className="card">
         <Counter count={count} onClick={incrementCount} />
         <Counter count={count} onClick={deferedIncrementCount} />
-        <button onClick={() => fetchPokemons()}>Fetch Pokemons</button>
+        <button onClick={fetchPokemonsClicked}>Fetch Pokemons</button>
+        {!!pokemons.length && (
+          <dl>
+            {pokemons.map((pokemon, idx) => (
+              <Pokemon pokemon={pokemon} onUp={() => movePokemon(pokemon.id, (idx+pokemons.length-1)%pokemons.length)} onDown={() => movePokemon(pokemon.id, (idx+pokemons.length+1)%pokemons.length)} ></Pokemon>
+            ))}
+          </dl>
+        )}
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
@@ -46,6 +69,17 @@ function Counter({ count, onClick }: {count: number, onClick: () => void}) {
       count is {count}
     </button>
   )
+}
+
+function Pokemon({ pokemon, onUp, onDown }: { pokemon: Pokemon, onUp: () => void, onDown: () => void }) {
+  console.log(`Rendering porkemon #${pokemon.id}`)
+  return <>
+    <dt>#{pokemon.id} {pokemon.name}
+      <button onClick={onUp}>⬆️</button>
+      <button onClick={onDown}>⬇️</button>
+    </dt>
+    <dd><img src={pokemon.sprites.front_default || pokemon.sprites.back_default}/></dd>
+  </>
 }
 
 type SpriteName = "back_default" | "front_default"
