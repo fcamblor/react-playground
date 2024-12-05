@@ -1,6 +1,6 @@
 import {fetchPokemons, Pokemon} from "./services/fetchPokemons.ts";
 import {PokemonComponent} from "./PokemonComponent.tsx";
-import {useState} from "react";
+import {useCallback, useState} from "react";
 
 export function PokemonsComponent({
 }: {
@@ -12,15 +12,13 @@ export function PokemonsComponent({
     setPokemons(pokemons);
   }
 
-  const movePokemon = (pokemonId: number, endingIndex: number) => {
-    const startingIndex = pokemons.findIndex(pk => pk.id === pokemonId)
-    if(startingIndex !== -1) {
-      const swap = pokemons[endingIndex]
-      pokemons[endingIndex] = pokemons[startingIndex]
-      pokemons[startingIndex] = swap;
-      setPokemons([...pokemons]);
-    }
-  }
+  const swapPokemons = useCallback((index1: number, index2: number) => {
+    setPokemons((previousPokemons) => {
+      const updatedPokemons = [...previousPokemons];
+      [updatedPokemons[index1], updatedPokemons[index2]] = [updatedPokemons[index2], updatedPokemons[index1]];
+      return updatedPokemons;
+    })
+  }, []);
 
   return (
     <>
@@ -30,9 +28,10 @@ export function PokemonsComponent({
           {pokemons.map((pokemon, idx) => (
             <PokemonComponent
               key={pokemon.id}
+              currentIndex={idx}
+              pokemonsSize={pokemons.length}
               pokemon={pokemon}
-              onUp={() => movePokemon(pokemon.id, (idx + pokemons.length - 1) % pokemons.length)}
-              onDown={() => movePokemon(pokemon.id, (idx + pokemons.length + 1) % pokemons.length)}
+              onSwap={swapPokemons}
             ></PokemonComponent>
           ))}
         </dl>
